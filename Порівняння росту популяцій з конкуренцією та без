@@ -1,0 +1,90 @@
+import React from 'react';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'recharts';
+
+const PopulationCompetition = () => {
+  const generateData = () => {
+    const data = [];
+    
+    // Початкові значення
+    let owlsNoComp = 100;
+    let hawksNoComp = 100;
+    let owlsWithComp = 100;
+    let hawksWithComp = 100;
+    
+    // Коефіцієнти
+    const k1 = 0.1; // коефіцієнт росту сов
+    const k2 = 0.08; // коефіцієнт росту яструбів
+    const c1 = 0.0004; // коефіцієнт впливу на сов
+    const c2 = 0.0004; // коефіцієнт впливу на яструбів
+    
+    for (let day = 0; day < 30; day++) {
+      data.push({
+        day,
+        'сови_без_конкуренції': Math.round(owlsNoComp),
+        'яструби_без_конкуренції': Math.round(hawksNoComp),
+        'сови_з_конкуренцією': Math.round(owlsWithComp),
+        'яструби_з_конкуренцією': Math.round(hawksWithComp),
+      });
+      
+      // Розрахунок для наступного дня
+      // Без конкуренції
+      owlsNoComp = owlsNoComp * (1 + k1);
+      hawksNoComp = hawksNoComp * (1 + k2);
+      
+      // З конкуренцією
+      owlsWithComp = owlsWithComp + (k1 * owlsWithComp - c1 * owlsWithComp * hawksWithComp);
+      hawksWithComp = hawksWithComp + (k2 * hawksWithComp - c2 * owlsWithComp * hawksWithComp);
+    }
+    
+    return data;
+  };
+
+  return (
+    <div className="space-y-8">
+      <div className="p-4 bg-white rounded-lg shadow">
+        <h3 className="text-lg font-semibold mb-4">Вплив конкуренції на ріст популяцій</h3>
+        <p className="mb-4">
+          Початкові умови: 100 особин кожного виду.
+          Суцільні лінії показують ріст без конкуренції, пунктирні - з урахуванням конкуренції.
+        </p>
+        <LineChart width={600} height={400} data={generateData()} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
+          <CartesianGrid strokeDasharray="3 3" />
+          <XAxis dataKey="day" label={{ value: "День", position: "bottom" }} />
+          <YAxis label={{ value: "Розмір популяції", angle: -90, position: "insideLeft" }} />
+          <Tooltip />
+          <Legend />
+          <Line 
+            type="monotone" 
+            dataKey="сови_без_конкуренції" 
+            stroke="#8884d8" 
+            name="Сови без конкуренції"
+            strokeWidth={2}
+          />
+          <Line 
+            type="monotone" 
+            dataKey="яструби_без_конкуренції" 
+            stroke="#82ca9d" 
+            name="Яструби без конкуренції"
+            strokeWidth={2}
+          />
+          <Line 
+            type="monotone" 
+            dataKey="сови_з_конкуренцією" 
+            stroke="#8884d8" 
+            strokeDasharray="5 5"
+            name="Сови з конкуренцією"
+          />
+          <Line 
+            type="monotone" 
+            dataKey="яструби_з_конкуренцією" 
+            stroke="#82ca9d" 
+            strokeDasharray="5 5"
+            name="Яструби з конкуренцією"
+          />
+        </LineChart>
+      </div>
+    </div>
+  );
+};
+
+export default PopulationCompetition;
