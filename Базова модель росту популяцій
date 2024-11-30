@@ -1,0 +1,58 @@
+import React from 'react';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'recharts';
+
+const PopulationGrowth = () => {
+  // Генерируем данные для трех различных начальных условий
+  const generateData = () => {
+    const data = [];
+    let o1 = 100, o2 = 200, o3 = 300; // Начальные популяции сов
+    let h1 = 150, h2 = 250, h3 = 350; // Начальные популяции ястребов
+    const k1 = 0.1; // Коэффициент роста сов
+    const k2 = 0.08; // Коэффициент роста ястребов
+    
+    for (let day = 0; day < 30; day++) {
+      data.push({
+        day,
+        'сови_1': Math.round(o1),
+        'сови_2': Math.round(o2),
+        'сови_3': Math.round(o3),
+        'яструби_1': Math.round(h1),
+        'яструби_2': Math.round(h2),
+        'яструби_3': Math.round(h3),
+      });
+      
+      // Рассчитываем следующий день
+      o1 = o1 * (1 + k1);
+      o2 = o2 * (1 + k1);
+      o3 = o3 * (1 + k1);
+      h1 = h1 * (1 + k2);
+      h2 = h2 * (1 + k2);
+      h3 = h3 * (1 + k2);
+    }
+    return data;
+  };
+
+  return (
+    <div className="space-y-8">
+      <div className="p-4 bg-white rounded-lg shadow">
+        <h3 className="text-lg font-semibold mb-4">Незалежний ріст популяцій</h3>
+        <p className="mb-4">Графік показує експоненціальний ріст популяцій при відсутності взаємодії між видами. Різні криві відповідають різним початковим умовам.</p>
+        <LineChart width={600} height={400} data={generateData()} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
+          <CartesianGrid strokeDasharray="3 3" />
+          <XAxis dataKey="day" label={{ value: "День", position: "bottom" }} />
+          <YAxis label={{ value: "Розмір популяції", angle: -90, position: "insideLeft" }} />
+          <Tooltip />
+          <Legend />
+          <Line type="monotone" dataKey="сови_1" stroke="#8884d8" name="Сови (100)" dot={false} />
+          <Line type="monotone" dataKey="сови_2" stroke="#82ca9d" name="Сови (200)" dot={false} />
+          <Line type="monotone" dataKey="сови_3" stroke="#ffc658" name="Сови (300)" dot={false} />
+          <Line type="monotone" dataKey="яструби_1" stroke="#ff8042" name="Яструби (150)" dot={false} />
+          <Line type="monotone" dataKey="яструби_2" stroke="#00C49F" name="Яструби (250)" dot={false} />
+          <Line type="monotone" dataKey="яструби_3" stroke="#FFBB28" name="Яструби (350)" dot={false} />
+        </LineChart>
+      </div>
+    </div>
+  );
+};
+
+export default PopulationGrowth;
