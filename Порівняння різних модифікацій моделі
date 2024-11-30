@@ -1,0 +1,56 @@
+import React from 'react';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'recharts';
+
+const ModelComparison = () => {
+  const generateData = () => {
+    const data = [];
+    // Базові параметри
+    const k1 = 0.05;
+    const k2 = 0.04;
+    const c1 = 0.0002;
+    const c2 = 0.0002;
+    
+    // Початкові умови
+    let owlsBase = 200;
+    let hawksBase = 250;
+    let owlsSeasonal = 200;
+    let hawksSeasonal = 250;
+    let owlsDelay = 200;
+    let hawksDelay = 250;
+    
+    // Зберігаємо попередні значення для затримки
+    const owlsHistory = Array(10).fill(200);
+    const hawksHistory = Array(10).fill(250);
+    
+    for (let day = 0; day < 300; day++) {
+      // Сезонний коефіцієнт
+      const seasonalFactor = 1 + 0.2 * Math.sin(2 * Math.PI * day / 100);
+      
+      // Базова модель
+      const dOBase = (k1*owlsBase - c1*owlsBase*hawksBase) * 0.5;
+      const dHBase = (k2*hawksBase - c2*owlsBase*hawksBase) * 0.5;
+      
+      // Модель з сезонністю
+      const dOSeasonal = (k1*owlsSeasonal*seasonalFactor - c1*owlsSeasonal*hawksSeasonal) * 0.5;
+      const dHSeasonal = (k2*hawksSeasonal*seasonalFactor - c2*owlsSeasonal*hawksSeasonal) * 0.5;
+      
+      // Модель з затримкою
+      const dODelay = (k1*owlsDelay - c1*owlsDelay*hawksHistory[0]) * 0.5;
+      const dHDelay = (k2*hawksDelay - c2*owlsHistory[0]*hawksDelay) * 0.5;
+      
+      data.push({
+        day,
+        'базова_сови': Math.round(owlsBase),
+        'базова_яструби': Math.round(hawksBase),
+        'сезонна_сови': Math.round(owlsSeasonal),
+        'сезонна_яструби': Math.round(hawksSeasonal),
+        'затримка_сови': Math.round(owlsDelay),
+        'затримка_яструби': Math.round(hawksDelay)
+      });
+      
+      // Оновлюємо значення
+      owlsBase += dOBase;
+      hawksBase += dHBase;
+      owlsSeasonal += dOSeasonal;
+      hawksSeasonal += dHSeasonal;
+      owlsDelay
