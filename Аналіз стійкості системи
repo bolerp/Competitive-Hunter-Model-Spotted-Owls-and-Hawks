@@ -1,0 +1,73 @@
+import React from 'react';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ReferenceLine } from 'recharts';
+
+const StabilityAnalysis = () => {
+  const generateData = () => {
+    const data = [];
+    const k1 = 0.05;
+    const k2 = 0.04;
+    const c1 = 0.0002;
+    const c2 = 0.0002;
+    
+    // Точка равновесия
+    const eqOwls = k2/c2;   // = 200
+    const eqHawks = k1/c1;  // = 250
+    
+    // Начальные значения с небольшим отклонением от равновесия
+    let owls = eqOwls + 20;   // +20 от равновесия
+    let hawks = eqHawks - 20;  // -20 от равновесия
+    
+    for (let day = 0; day < 200; day++) {
+      data.push({
+        day,
+        owls: Math.round(owls),
+        hawks: Math.round(hawks),
+        eqOwls: Math.round(eqOwls),
+        eqHawks: Math.round(eqHawks)
+      });
+      
+      const dO = (k1*owls - c1*owls*hawks) * 0.5;
+      const dH = (k2*hawks - c2*owls*hawks) * 0.5;
+      
+      owls = owls + dO;
+      hawks = hawks + dH;
+    }
+    
+    return data;
+  };
+
+  return (
+    <div className="space-y-8">
+      <div className="p-4 bg-white rounded-lg shadow">
+        <h3 className="text-lg font-semibold mb-4">Повернення до рівноваги після відхилення</h3>
+        <p className="mb-4">
+          Початкове відхилення: +20 сов, -20 яструбів від точки рівноваги.
+          Пунктирні лінії показують рівноважні значення.
+        </p>
+        <LineChart width={600} height={400} data={generateData()} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
+          <CartesianGrid strokeDasharray="3 3" />
+          <XAxis dataKey="day" label={{ value: "Час (дні)", position: "bottom" }} />
+          <YAxis label={{ value: "Розмір популяції", angle: -90, position: "insideLeft" }} />
+          <Tooltip />
+          <Legend />
+          <Line 
+            type="monotone" 
+            dataKey="owls" 
+            stroke="#8884d8" 
+            name="Популяція сов"
+          />
+          <Line 
+            type="monotone" 
+            dataKey="hawks" 
+            stroke="#82ca9d" 
+            name="Популяція яструбів"
+          />
+          <ReferenceLine y={200} stroke="#8884d8" strokeDasharray="3 3" label="Рівновага сов" />
+          <ReferenceLine y={250} stroke="#82ca9d" strokeDasharray="3 3" label="Рівновага яструбів" />
+        </LineChart>
+      </div>
+    </div>
+  );
+};
+
+export default StabilityAnalysis;
